@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Roster Change Request</title>
+      <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
+      <link 
+         rel="stylesheet" 
+         href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+         crossorigin="anonymous"
+         >
+      <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <!-- Code for dynamic records -->
+      <script>
+         $(document).ready(function () {
+         
+           var rowIdx = 1;
+         
+           // jQuery button click event to add a row
+           $('#addBtn').on('click', function () {
+         
+             // Adding a row inside the tbody.
+             $('#tbody').append(`
+               <tr id="R${++rowIdx}" name="record">
+                 <td class="row-index text-center">
+                   <p>${rowIdx}</p>
+                 </td>
+                 <td>
+                   <input type="text" name="facultyName" />
+                 </td>
+                 <td>
+                   <input type="text" name="facultyEmail" />
+                 </td>
+                 <td>
+                   <select name="actionType" id="actionType" style="width: 192px;">
+                     <option value="(None)">--None--</option>
+                     <option value="Add">Add</option>
+                     <option value="Drop/Withdraw">Drop/Withdraw</option>
+                     <option value="Move To Another Cohort">Move to another cohort</option>
+                   </select>
+                 </td>
+                 <td>
+                   <input type="text" name="moveTo" />
+                 </td>
+                 <td>
+                   <input type="text" name="reason" />
+                 </td>
+                 <td class="text-center">
+                   <button class="btn btn-danger remove" type="button">Remove</button>
+                 </td>
+               </tr>`);
+           });
+         
+           // jQuery button click event to remove a row.
+           $('#tbody').on('click', '.remove', function () {
+         
+             // Getting all the rows next to the row
+             // containing the clicked button
+             var child = $(this).closest('tr').nextAll();
+         
+             // Iterating across all the rows 
+             // obtained to change the index
+             child.each(function () {
+         
+               // Getting <tr> id.
+               var id = $(this).attr('id');
+         
+               // Getting the <p> inside the .row-index class.
+               var idx = $(this).children('.row-index').children('p');
+         
+               // Gets the row number from <tr> id.
+               var dig = parseInt(id.substring(1));
+         
+               // Modifying row index.
+               idx.html(`${dig - 1}`);
+         
+               // Modifying row id.
+               $(this).attr('id', `R${dig - 1}`);
+             });
+         
+             // Removing the current row.
+             $(this).closest('tr').remove();
+         
+             // Decreasing total number of rows by 1.
+             rowIdx--;
+           });
+      
+           // Code for sending records to hidden textarea field         
+           $("#requestRecords").on("submit", function (e) {
+             e.preventDefault();
+           
+             var names = document.getElementsByName("facultyName");
+             var emails = document.getElementsByName("facultyEmail");
+             var actions = document.getElementsByName("actionType");
+             var moves = document.getElementsByName("moveTo");
+             var reasons = document.getElementsByName("reason");
+             var field = document.getElementById("00NEY000000OBHx");
+           
+             for (var i=0; i<names.length; i++) {
+               field.value += 
+                 i+1 +
+                 " \"" + 
+                 names[i].value + 
+                 "\" \"" + 
+                 emails[i].value + 
+                 "\" \"" + 
+                 actions[i].value + 
+                 "\" \"" + 
+                 moves[i].value + 
+                 "\" \"" + 
+                 reasons[i].value + 
+                 "\"\r\n"
+             }
+
+             document.getElementById('submitToSF').click();
+           });
+
+           //Alternative solution with JSON
+           document.querySelector("#testBtn").onclick=ev=>{
+            let res=[...document.getElementById("tbody").children].map(tr=>
+            Object.fromEntries([...tr.querySelectorAll("input,select")].map(el=>
+            [el.name,el.value])));
+            console.log(res);
+           }
+         });
+      </script>
+
+   </head>
+
+   <body style="align-items: center; max-width: 80%; margin: 0 auto !important;">
+      <div style="display: grid; grid-template-columns: 1fr 3fr; grid-gap: 20px;">
+         <div>
+            <!-- logo here -->
+         </div>
+         <div>
+            <h2>Roster change request form</h2>
+         </div>
+      </div>
+      <div style="margin: 20px 0px;">
+         <p>Intro text here</p>
+      </div>
+      <!-- SF form -->
+      <form action="https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8" method="POST">
+         <input type=hidden name="orgid" value="[orgid]">
+         <input type=hidden name="retURL" value="https://github.com/">
+         <label for="subject" style="font-weight: bold;">Subject</label>
+         <br>
+         <input  id="subject" maxlength="80" name="subject" size="20" type="text" style="width:266px;" />
+         <br>
+         <label for="name" style="font-weight: bold;">Your Name</label>
+         <br>
+         <input  id="name" maxlength="80" name="name" size="20" type="text" style="width:266px;" />
+         <br>
+         <label for="email" style="font-weight: bold;">Your Email</label>
+         <br>
+         <input  id="email" maxlength="80" name="email" size="20" type="text" style="width:266px;" />
+         <br>
+         <label for="00NEY000000OBI7" style="font-weight: bold;">Your Role</label>
+         <br>
+         <select id="00NEY000000OBI7" name="00NEY000000OBI7" title="Web Role" style="width:266px;">
+            <option value="">--None--</option>
+            <option value="Campus Lead">Campus Lead</option>
+            <option value="Facilitator">Facilitator</option>
+            <option value="Academic Director">Academic Director</option>
+            <option value="Partnership Success Director">Partnership Success Director</option>
+            <option value="Other">Other</option>
+         </select>
+         <br>
+         <label for="company" style="font-weight: bold;">Institution</label>
+         <br>
+         <input  id="company" maxlength="80" name="company" size="20" type="text" style="width:266px;" />
+         <br>
+         <label for="00NEY000000OBI2" style="font-weight: bold;">Program Name</label>
+         <br>
+         <input id="00NEY000000OBI2" maxlength="250" name="00NEY000000OBI2" size="20" type="text" style="width:266px;" />
+         <br>
+         <!-- Hidden record type field -->
+         <select id="recordType" name="recordType" hidden>
+            <option value="012EY0000004Hqb">Roster Update Request</option>
+         </select>
+         <br>
+         <!-- Hidden field for text from dynamic records -->
+         <label for="00NEY000000OBHx" hidden>Change Details (hide it)</label>
+         <br>
+         <textarea id="00NEY000000OBHx" name="00NEY000000OBHx" rows="3" type="text" hidden ></textarea>
+
+         <!-- This button submits the form to SF -->
+         <!-- We don't click it directly, but through a "Send Request" btn -->
+         <!-- as we need to populate another field first -->
+         <input type="submit" name="submit" id="submitToSF" hidden>
+      </form>
+      
+      <form id="requestRecords">
+         <div class="container pt-4">
+            <div class="table-responsive">
+               <table id="recordsTable">
+                  <thead>
+                     <th class="text-center">#</th>
+                     <th class="text-center">Faculty Name</th>
+                     <th class="text-center">Faculty Email</th>
+                     <th class="text-center">Action</th>
+                     <th class="text-center">Move To Cohort</th>
+                     <th class="text-center">Reason</th>
+                     <th></th>
+                  </thead>
+                  <tbody id="tbody">
+                     <tr id="R1" name="record">
+                        <td class="row-index text-center">
+                           <p>1</p>
+                        </td>
+                        <td>
+                           <input type="text" name="facultyName" id="facultyName" />
+                        </td>
+                        <td>
+                           <input type="text" name="facultyEmail" id="facultyEmail"/>
+                        </td>
+                        <td>
+                           <select name="actionType" id="actionType" style="width: 192px;">
+                              <option value="(None)">--None--</option>
+                              <option value="Add">Add</option>
+                              <option value="Drop/Withdraw">Drop/Withdraw</option>
+                              <option value="Move To Another Cohort">Move to another cohort</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="text" name="moveTo" id="moveTo" />
+                        </td>
+                        <td>
+                           <input type="text" name="reason" id="reason" />
+                        </td>
+                        <td class="text-center">
+                        </td>
+                     </tr>
+                     <!-- Dynamic rows appear here -->
+                  </tbody>
+               </table>
+            </div>
+            <button class="btn btn-md btn-primary" 
+               id="addBtn" type="button">
+            Add New Row
+            </button>
+         </div>
+         </br></br>
+         <button class="btn btn-md btn-primary"
+            type="submit">
+         Send Request
+         </button>
+         <!-- This button is for alternative JSON solution testing -->
+         <button id="testBtn" hidden>Test</button>
+      </form>
+   </body>
+</html>
